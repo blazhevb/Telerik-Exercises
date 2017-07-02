@@ -1,0 +1,124 @@
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace Sandbox
+{
+    class Program
+    {
+        static int[] set;
+        static void Main()
+        {
+            int N = int.Parse(Console.ReadLine());
+            List<int>[] flights = new List<int>[N];
+            for (int l = 0; l < N; l++)
+            {
+                flights[l] = new List<int>();
+                flights[l].Add(-1);
+                flights[l].Add(N + 1);
+            }
+            while (true)
+            {
+
+                string[] input = Console.ReadLine().Split(' ');
+                int a = int.Parse(input[0]);
+                int b = int.Parse(input[1]);
+                if (a < 0)
+                {
+                    break;
+                }
+                flights[a].Add(b);
+                flights[b].Add(a);
+            };
+
+
+
+            set = new int[N];
+            MakeSet(N, set, -1);
+
+            for (int k = 0; k < N; k++)
+            {
+                flights[k].Sort();
+                for (int m = 1; m < flights[k].Count - 1; m++)
+                {
+                    if (flights[k][m] != flights[k][m - 1] && flights[k][m] != flights[k][m + 1])
+                    {
+                        Union(k, flights[k][m]);
+                    }
+
+                }
+
+            }
+            int[] roots = new int[N];
+            MakeSet(N, roots, 1);
+            BigInteger finalresult = 0;
+            for (int d = 0; d < set.Length; d++)
+            {
+                if (set[d] == -1)
+                {
+                    continue;
+                }
+                else
+                {
+                    Find(d);
+                    roots[set[d]]++;
+                }
+
+            }
+
+            foreach (int h in roots)
+            {
+                if (h > 1)
+                {
+                    finalresult += getPossibleCombinations(h);
+                }
+            }
+            Console.WriteLine(finalresult);
+
+
+        }
+
+        static BigInteger getPossibleCombinations(BigInteger m)
+        {
+            if (m == 2)
+            {
+                return 1;
+            }
+            return Factorial(m) / (2 * Factorial(m - 2));
+        }
+
+        static BigInteger Factorial(BigInteger f)
+        {
+            BigInteger result = 1;
+            for (BigInteger fc = f; f > 0; f--)
+            {
+                result *= f;
+            }
+            return result;
+        }
+
+
+        static int Find(int num)
+        {
+            return set[num] < 0 ? num : set[num] = Find(set[num]);
+        }
+        static void Union(int x, int y)
+        {
+            x = Find(x);
+            y = Find(y);
+            if (x != y)
+            {
+                set[x] = y;
+            }
+        }
+
+        static void MakeSet(int x, int[] newInt, int num)
+        {
+
+            for (int i = 0; i < x; i++)
+            {
+                newInt[i] = num;
+            }
+        }
+    }
+}
